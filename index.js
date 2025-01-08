@@ -18,16 +18,35 @@ app.get("/", function (req, res) {
   res.sendFile(__dirname + '/views/index.html');
 });
 
+const isInvalidDate = (date) => date.toUTCString() === "Invalid Date"
 
-// your first API endpoint... 
-app.get("/api/hello", function (req, res) {
-  res.json({greeting: 'hello API'});
-});
+// Empty api check has to be BEFORE date api
+app.get("/api", function (req, res) {
+  res.json({
+    unix: new Date().getTime(),
+    utc: new Date().toUTCString()
+  })
+})
+
 app.get("/api/:date?", function (req, res) {
-  var unix = new Date(req.query.unix);
-  var timestamp = unix.getTime();
-  res.json({unix: timestamp });
+  var date = new Date(req.params.date);
+
+    if(isInvalidDate(date)){
+      //Unary Plus Operator turns string into number
+      date = new Date(+req.params.date)
+    }
+    if(isInvalidDate(date)){
+      res.json({ error: "Invalid Date"})
+      return;
+    }
+  res.json({
+    unix: date.getTime(), 
+    utc: date.toUTCString()
+  })
 });
+
+
+
 
 
 
